@@ -27,6 +27,7 @@ export default function GraphView() {
   const selectNode = useDashboardStore((s) => s.selectNode);
   const showLayers = useDashboardStore((s) => s.showLayers);
   const tourHighlightedNodeIds = useDashboardStore((s) => s.tourHighlightedNodeIds);
+  const persona = useDashboardStore((s) => s.persona);
 
   const { initialNodes, initialEdges } = useMemo(() => {
     if (!graph)
@@ -35,7 +36,24 @@ export default function GraphView() {
         initialEdges: [] as Edge[],
       };
 
-    const flowNodes: CustomFlowNode[] = graph.nodes.map((node) => {
+    // Filter nodes and edges based on persona
+    const filteredGraphNodes =
+      persona === "non-technical"
+        ? graph.nodes.filter(
+            (n) =>
+              n.type === "concept" || n.type === "module" || n.type === "file",
+          )
+        : graph.nodes;
+
+    const filteredNodeIds = new Set(filteredGraphNodes.map((n) => n.id));
+    const filteredGraphEdges =
+      persona === "non-technical"
+        ? graph.edges.filter(
+            (e) => filteredNodeIds.has(e.source) && filteredNodeIds.has(e.target),
+          )
+        : graph.edges;
+
+    const flowNodes: CustomFlowNode[] = filteredGraphNodes.map((node) => {
       const matchResult = searchResults.find((r) => r.nodeId === node.id);
       return {
         id: node.id,
@@ -54,7 +72,7 @@ export default function GraphView() {
       };
     });
 
-    const flowEdges: Edge[] = graph.edges.map((edge, i) => ({
+    const flowEdges: Edge[] = filteredGraphEdges.map((edge, i) => ({
       id: `e-${i}`,
       source: edge.source,
       target: edge.target,
@@ -164,7 +182,7 @@ export default function GraphView() {
     ];
 
     return { initialNodes: allNodes, initialEdges: laid.edges };
-  }, [graph, searchResults, selectedNodeId, showLayers, tourHighlightedNodeIds]);
+  }, [graph, searchResults, selectedNodeId, showLayers, tourHighlightedNodeIds, persona]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

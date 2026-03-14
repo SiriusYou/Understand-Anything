@@ -7,6 +7,8 @@ import type {
   TourStep,
 } from "@understand-anything/core/types";
 
+export type Persona = "non-technical" | "junior" | "experienced";
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -33,6 +35,8 @@ interface DashboardStore {
   currentTourStep: number;
   tourHighlightedNodeIds: string[];
 
+  persona: Persona;
+
   setGraph: (graph: KnowledgeGraph) => void;
   selectNode: (nodeId: string | null) => void;
   setSearchQuery: (query: string) => void;
@@ -41,6 +45,7 @@ interface DashboardStore {
   clearChat: () => void;
   toggleLayers: () => void;
   explainNode: (nodeId: string) => Promise<void>;
+  setPersona: (persona: Persona) => void;
 
   startTour: () => void;
   stopTour: () => void;
@@ -145,6 +150,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   currentTourStep: 0,
   tourHighlightedNodeIds: [],
 
+  persona: "junior",
+
   setGraph: (graph) => {
     const searchEngine = new SearchEngine(graph.nodes);
     const query = get().searchQuery;
@@ -224,6 +231,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   clearChat: () => set({ chatMessages: [] }),
 
   toggleLayers: () => set((state) => ({ showLayers: !state.showLayers })),
+
+  setPersona: (persona) => set({ persona }),
 
   explainNode: async (nodeId) => {
     const { apiKey, graph, nodeExplanationCache } = get();
