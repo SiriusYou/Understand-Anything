@@ -13,6 +13,7 @@ import "@xyflow/react/dist/style.css";
 import CustomNode from "./CustomNode";
 import type { CustomFlowNode } from "./CustomNode";
 import { useDashboardStore } from "../store";
+import { applyDagreLayout } from "../utils/layout.ts";
 
 const nodeTypes = { custom: CustomNode };
 
@@ -22,15 +23,13 @@ export default function GraphView() {
   const searchResults = useDashboardStore((s) => s.searchResults);
   const selectNode = useDashboardStore((s) => s.selectNode);
 
-  const initialNodes = useMemo<CustomFlowNode[]>(() => {
-    if (!graph) return [];
-    return graph.nodes.map((node, i) => ({
+  const { initialNodes, initialEdges } = useMemo(() => {
+    if (!graph) return { initialNodes: [] as CustomFlowNode[], initialEdges: [] as Edge[] };
+
+    const flowNodes: CustomFlowNode[] = graph.nodes.map((node) => ({
       id: node.id,
       type: "custom" as const,
-      position: {
-        x: (i % 3) * 300 + 50,
-        y: Math.floor(i / 3) * 200 + 50,
-      },
+      position: { x: 0, y: 0 },
       data: {
         label: node.name,
         nodeType: node.type,
@@ -40,11 +39,8 @@ export default function GraphView() {
         isSelected: selectedNodeId === node.id,
       },
     }));
-  }, [graph, searchResults, selectedNodeId]);
 
-  const initialEdges = useMemo<Edge[]>(() => {
-    if (!graph) return [];
-    return graph.edges.map((edge, i) => ({
+    const flowEdges: Edge[] = graph.edges.map((edge, i) => ({
       id: `e-${i}`,
       source: edge.source,
       target: edge.target,
@@ -53,7 +49,13 @@ export default function GraphView() {
       style: { stroke: "#6b7280", strokeWidth: 1.5 },
       labelStyle: { fill: "#9ca3af", fontSize: 10 },
     }));
-  }, [graph]);
+
+    const laid = applyDagreLayout(flowNodes, flowEdges);
+    return {
+      initialNodes: laid.nodes as CustomFlowNode[],
+      initialEdges: laid.edges,
+    };
+  }, [graph, searchResults, selectedNodeId]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
