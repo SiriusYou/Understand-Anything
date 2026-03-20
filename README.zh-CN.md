@@ -4,7 +4,11 @@
 </p>
 
 <p align="center">
-  <a href="#-quick-start"><img src="https://img.shields.io/badge/快速开始-blue?style=for-the-badge" alt="Quick Start" /></a>
+  <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
+</p>
+
+<p align="center">
+  <a href="#-快速开始"><img src="https://img.shields.io/badge/快速开始-blue?style=for-the-badge" alt="Quick Start" /></a>
   <a href="https://github.com/Lum1104/Understand-Anything/blob/main/LICENSE"><img src="https://img.shields.io/badge/许可证-MIT-yellow?style=for-the-badge" alt="License: MIT" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-插件-8A2BE2?style=for-the-badge" alt="Claude Code Plugin" /></a>
   <a href="https://lum1104.github.io/Understand-Anything"><img src="https://img.shields.io/badge/项目主页-d4a574?style=for-the-badge" alt="Homepage" /></a>
@@ -24,7 +28,7 @@ Understand Anything 是一个基于 [Claude Code](https://docs.anthropic.com/en/
 
 ## 🤔 为什么需要它？
 
-阅读代码已经很难，理解整个系统更难。文档往往过时，上手周期长达数周， 新功能开发像“考古” 。
+阅读代码已经很难，理解整个系统更难。文档往往过时，上手周期长达数周，新功能开发像考古。
 
 Understand Anything 通过结合 **大语言模型（LLM）**与**静态代码分析**去生成一个**动态、可探索的代码知识地图** — 并提供自然语言解释。
 
