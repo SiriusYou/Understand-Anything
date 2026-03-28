@@ -59,7 +59,7 @@ For each file in `batchFiles`, read the file content and extract:
 **Basic Metrics:**
 - Total line count
 - Non-empty line count (lines that are not blank or comment-only)
-- Import count (number of import statements)
+- Import count — use `batchImportData[file.path].length` from the input JSON (do not count from source)
 - Export count (number of export statements)
 - Function count, class count
 

@@ -440,7 +440,7 @@ For each file, read its content and extract import paths using language-appropri
 For each extracted import path:
 1. Compute the resolved file path relative to project root:
    - For relative imports (`./x`, `../x`): resolve from the importing file's directory
-   - Try these extension variants in order if the import has no extension: `.ts`, `.tsx`, `.js`, `.jsx`, `/index.ts`, `/index.js`, `/index.tsx`, `/index.js`, `.py`, `.go`, `.rs`, `.rb`
+   - Try these extension variants in order if the import has no extension: `.ts`, `.tsx`, `.js`, `.jsx`, `/index.ts`, `/index.js`, `/index.tsx`, `/index.jsx`, `.py`, `.go`, `.rs`, `.rb`
 2. Check if the resolved path exists in the discovered file list
 3. If yes: add to this file's resolved imports list
 4. If no: skip (external, unresolvable, or dynamic import)
