@@ -99,7 +99,9 @@ function SelectedNodeFitView() {
 
   useEffect(() => {
     if (selectedNodeId && selectedNodeId !== prevRef.current) {
-      requestAnimationFrame(() => {
+      // Delay slightly so this runs after any layer-level fitView triggered
+      // by navigateToNodeInLayer (which also changes activeLayerId).
+      const timer = setTimeout(() => {
         fitView({
           nodes: [{ id: selectedNodeId }],
           duration: 500,
@@ -107,7 +109,9 @@ function SelectedNodeFitView() {
           maxZoom: 1.2,
           minZoom: 0.01,
         });
-      });
+      }, 100);
+      prevRef.current = selectedNodeId;
+      return () => clearTimeout(timer);
     }
     prevRef.current = selectedNodeId;
   }, [selectedNodeId, fitView]);
@@ -244,21 +248,23 @@ function useLayerDetailTopology() {
       }
     }
 
-    // All top-level (file-level) node types that should appear in the graph.
-    // This includes the 8 new non-code types plus the original "file" type.
-    const fileLevelTypes = new Set([
-      "file", "config", "document", "service", "table",
+    // All node types visible at each persona level (single source of truth).
+    // Sub-file types (function, class) are only shown for junior/experienced.
+    const subFileTypes = new Set(["function", "class"]);
+    const allVisibleTypes = new Set([
+      "file", "module", "concept",
+      "config", "document", "service", "table",
       "endpoint", "pipeline", "schema", "resource",
       "domain", "flow", "step",
+      "function", "class",
     ]);
 
-    // Non-technical persona: show module, concept, and file-level types (hide function/class)
-    // Junior/experienced persona: show everything including function/class
-    let filteredGraphNodes = persona === "non-technical"
-      ? graph.nodes.filter(
-          (n) => expandedLayerNodeIds.has(n.id) && (n.type === "concept" || n.type === "module" || fileLevelTypes.has(n.type)),
-        )
-      : graph.nodes.filter((n) => expandedLayerNodeIds.has(n.id) && (fileLevelTypes.has(n.type) || n.type === "module" || n.type === "concept" || n.type === "function" || n.type === "class"));
+    let filteredGraphNodes = graph.nodes.filter((n) => {
+      if (!expandedLayerNodeIds.has(n.id)) return false;
+      if (!allVisibleTypes.has(n.type)) return false;
+      if (persona === "non-technical" && subFileTypes.has(n.type)) return false;
+      return true;
+    });
 
     // Apply node type category filters
     filteredGraphNodes = filteredGraphNodes.filter((n) => {

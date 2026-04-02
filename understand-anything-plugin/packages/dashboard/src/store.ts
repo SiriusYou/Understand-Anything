@@ -11,7 +11,7 @@ export type Persona = "non-technical" | "junior" | "experienced";
 export type NavigationLevel = "overview" | "layer-detail";
 export type NodeType = "file" | "function" | "class" | "module" | "concept" | "config" | "document" | "service" | "table" | "endpoint" | "pipeline" | "schema" | "resource" | "domain" | "flow" | "step";
 export type Complexity = "simple" | "moderate" | "complex";
-export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "domain";
+export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "infrastructure" | "domain";
 export type ViewMode = "structural" | "domain";
 
 export interface FilterState {
@@ -23,7 +23,7 @@ export interface FilterState {
 
 export const ALL_NODE_TYPES: NodeType[] = ["file", "function", "class", "module", "concept", "config", "document", "service", "table", "endpoint", "pipeline", "schema", "resource", "domain", "flow", "step"];
 export const ALL_COMPLEXITIES: Complexity[] = ["simple", "moderate", "complex"];
-export const ALL_EDGE_CATEGORIES: EdgeCategory[] = ["structural", "behavioral", "data-flow", "dependencies", "semantic", "domain"];
+export const ALL_EDGE_CATEGORIES: EdgeCategory[] = ["structural", "behavioral", "data-flow", "dependencies", "semantic", "infrastructure", "domain"];
 
 export const EDGE_CATEGORY_MAP: Record<EdgeCategory, string[]> = {
   structural: ["imports", "exports", "contains", "inherits", "implements"],
@@ -31,6 +31,7 @@ export const EDGE_CATEGORY_MAP: Record<EdgeCategory, string[]> = {
   "data-flow": ["reads_from", "writes_to", "transforms", "validates"],
   dependencies: ["depends_on", "tested_by", "configures"],
   semantic: ["related", "similar_to"],
+  infrastructure: ["deploys", "serves", "provisions", "triggers", "migrates", "documents", "routes", "defines_schema"],
   domain: ["contains_flow", "flow_step", "cross_domain"],
 };
 
@@ -486,6 +487,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       ? [...nodeHistory, selectedNodeId].slice(-MAX_HISTORY)
       : nodeHistory;
     set({
+      viewMode: "domain" as const,
       activeDomainId: domainId,
       focusNodeId: null,
       nodeHistory: newHistory,
