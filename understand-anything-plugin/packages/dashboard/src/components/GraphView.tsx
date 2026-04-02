@@ -234,6 +234,16 @@ function useLayerDetailTopology() {
 
     const layerNodeIds = new Set(activeLayer.nodeIds);
 
+    // Expand layer membership to include sub-file nodes (function/class) whose
+    // parent file is in this layer. These nodes aren't in layer.nodeIds directly
+    // but belong to the layer via their "contains" edge from a file node.
+    const expandedLayerNodeIds = new Set(layerNodeIds);
+    for (const edge of graph.edges) {
+      if (edge.type === "contains" && layerNodeIds.has(edge.source)) {
+        expandedLayerNodeIds.add(edge.target);
+      }
+    }
+
     // All top-level (file-level) node types that should appear in the graph.
     // This includes the 8 new non-code types plus the original "file" type.
     const fileLevelTypes = new Set([
@@ -246,9 +256,9 @@ function useLayerDetailTopology() {
     // Junior/experienced persona: show everything including function/class
     let filteredGraphNodes = persona === "non-technical"
       ? graph.nodes.filter(
-          (n) => layerNodeIds.has(n.id) && (n.type === "concept" || n.type === "module" || fileLevelTypes.has(n.type)),
+          (n) => expandedLayerNodeIds.has(n.id) && (n.type === "concept" || n.type === "module" || fileLevelTypes.has(n.type)),
         )
-      : graph.nodes.filter((n) => layerNodeIds.has(n.id) && (fileLevelTypes.has(n.type) || n.type === "module" || n.type === "concept" || n.type === "function" || n.type === "class"));
+      : graph.nodes.filter((n) => expandedLayerNodeIds.has(n.id) && (fileLevelTypes.has(n.type) || n.type === "module" || n.type === "concept" || n.type === "function" || n.type === "class"));
 
     // Apply node type category filters
     filteredGraphNodes = filteredGraphNodes.filter((n) => {
