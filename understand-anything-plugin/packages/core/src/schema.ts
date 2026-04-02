@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Edge types (26 values across 6 categories)
+// Edge types (29 values across 7 categories)
 export const EdgeTypeSchema = z.enum([
   "imports", "exports", "contains", "inherits", "implements",  // Structural
   "calls", "subscribes", "publishes", "middleware",             // Behavioral
@@ -9,6 +9,7 @@ export const EdgeTypeSchema = z.enum([
   "related", "similar_to",                                      // Semantic
   "deploys", "serves", "provisions", "triggers",               // Infrastructure
   "migrates", "documents", "routes", "defines_schema",         // Schema/Data
+  "contains_flow", "flow_step", "cross_domain",                // Domain
 ]);
 
 // Aliases that LLMs commonly generate instead of canonical node types
@@ -28,10 +29,8 @@ export const NODE_TYPE_ALIASES: Record<string, string> = {
   doc: "document",
   readme: "document",
   docs: "document",
-  workflow: "pipeline",
   job: "pipeline",
   ci: "pipeline",
-  action: "pipeline",
   route: "endpoint",
   api: "endpoint",
   query: "endpoint",
@@ -50,6 +49,12 @@ export const NODE_TYPE_ALIASES: Record<string, string> = {
   protobuf: "schema",
   definition: "schema",
   typedef: "schema",
+  // Domain aliases
+  business_domain: "domain",
+  process: "flow",
+  workflow: "flow",
+  action: "step",
+  task: "step",
 };
 
 // Aliases that LLMs commonly generate instead of canonical edge types
@@ -79,6 +84,11 @@ export const EDGE_TYPE_ALIASES: Record<string, string> = {
   triggers_on: "triggers",
   fires: "triggers",
   defines: "defines_schema",
+  // Domain aliases
+  has_flow: "contains_flow",
+  next_step: "flow_step",
+  interacts_with: "cross_domain",
+  implemented_by: "implements",
 };
 
 // Aliases for complexity values LLMs commonly generate
@@ -313,6 +323,7 @@ export const GraphNodeSchema = z.object({
     "file", "function", "class", "module", "concept",
     "config", "document", "service", "table", "endpoint",
     "pipeline", "schema", "resource",
+    "domain", "flow", "step",
   ]),
   name: z.string(),
   filePath: z.string().optional(),
@@ -321,7 +332,7 @@ export const GraphNodeSchema = z.object({
   tags: z.array(z.string()),
   complexity: z.enum(["simple", "moderate", "complex"]),
   languageNotes: z.string().optional(),
-});
+}).passthrough();
 
 export const GraphEdgeSchema = z.object({
   source: z.string(),
